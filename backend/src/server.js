@@ -1,8 +1,9 @@
-﻿require('dotenv').config();
+require('dotenv').config();
 const http = require('http');
 const app = require('./app');
 const connectDB = require('./config/db');
 const seedAdmin = require('./utils/seedAdmin');
+const seedDemoData = require('./utils/seedDemoData');
 
 const PORT = process.env.PORT || 5000;
 
@@ -12,8 +13,9 @@ const startServer = async () => {
     // 1. Connect Database
     await connectDB();
 
-    // 2. Seed Default Admin if not exists
+    // 2. Seed Default Admin & Demo Accounts if not exists
     await seedAdmin();
+    await seedDemoData();
 
     // 3. Start HTTP Listener
     const server = http.createServer(app);
