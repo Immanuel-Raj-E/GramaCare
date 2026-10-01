@@ -4,6 +4,9 @@ const cors = require('cors');
 const { notFound, errorHandler } = require('./middleware/errorMiddleware');
 const { successResponse } = require('./utils/apiResponse');
 
+// Route imports
+const authRoutes = require('./routes/authRoutes');
+
 const app = express();
 
 // CORS configuration
@@ -19,8 +22,7 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Protected uploads folder access will be streamed via report routes,
-// but static path is ready for public static assets if needed.
+// Protected uploads folder access will be streamed via report routes
 const uploadsDir = path.join(__dirname, '..', 'uploads');
 app.use('/uploads', express.static(uploadsDir));
 
@@ -33,7 +35,8 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Future Route Mounts will be attached here in upcoming modules
+// API Routes
+app.use('/api/auth', authRoutes);
 
 // 404 & Centralized Error Handlers
 app.use(notFound);

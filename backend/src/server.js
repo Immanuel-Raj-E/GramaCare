@@ -2,6 +2,7 @@
 const http = require('http');
 const app = require('./app');
 const connectDB = require('./config/db');
+const seedAdmin = require('./utils/seedAdmin');
 
 const PORT = process.env.PORT || 5000;
 
@@ -11,7 +12,10 @@ const startServer = async () => {
     // 1. Connect Database
     await connectDB();
 
-    // 2. Start HTTP Listener
+    // 2. Seed Default Admin if not exists
+    await seedAdmin();
+
+    // 3. Start HTTP Listener
     const server = http.createServer(app);
     server.listen(PORT, () => {
       console.log(`[GramaCare Backend] Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
