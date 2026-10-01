@@ -1,9 +1,11 @@
-﻿import React from 'react';
+import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import ProtectedRoute from './ProtectedRoute';
 
 // Layouts
 import PatientLayout from '../layouts/PatientLayout';
+import DoctorLayout from '../layouts/DoctorLayout';
+import AdminLayout from '../layouts/AdminLayout';
 
 // Public Pages
 import LandingPage from '../pages/public/LandingPage';
@@ -21,9 +23,21 @@ import PatientReports from '../pages/patient/PatientReports';
 import PatientMessages from '../pages/patient/PatientMessages';
 import PatientNotifications from '../pages/patient/PatientNotifications';
 
-// Other Role Dashboards (Doctor & Admin)
+// Doctor Module Pages
 import DoctorDashboard from '../pages/doctor/DoctorDashboard';
+import DoctorAppointments from '../pages/doctor/DoctorAppointments';
+import DoctorPatients from '../pages/doctor/DoctorPatients';
+import DoctorConsultation from '../pages/doctor/DoctorConsultation';
+import DoctorPrescriptions from '../pages/doctor/DoctorPrescriptions';
+import DoctorMessages from '../pages/doctor/DoctorMessages';
+import DoctorProfile from '../pages/doctor/DoctorProfile';
+import DoctorNotifications from '../pages/doctor/DoctorNotifications';
+
+// Admin Module Pages
 import AdminDashboard from '../pages/admin/AdminDashboard';
+import AdminDoctors from '../pages/admin/AdminDoctors';
+import AdminUsers from '../pages/admin/AdminUsers';
+import AdminAppointments from '../pages/admin/AdminAppointments';
 
 const AppRoutes = () => {
   return (
@@ -34,7 +48,7 @@ const AppRoutes = () => {
       <Route path="/register" element={<Register />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
 
-      {/* Patient Protected Portal (Nested in PatientLayout) */}
+      {/* Patient Portal (Nested in PatientLayout) */}
       <Route
         path="/patient"
         element={
@@ -54,25 +68,41 @@ const AppRoutes = () => {
         <Route path="notifications" element={<PatientNotifications />} />
       </Route>
 
-      {/* Doctor Protected Routes */}
+      {/* Doctor Portal (Nested in DoctorLayout) */}
       <Route
-        path="/doctor/dashboard"
+        path="/doctor"
         element={
           <ProtectedRoute allowedRoles={['doctor']}>
-            <DoctorDashboard />
+            <DoctorLayout />
           </ProtectedRoute>
         }
-      />
+      >
+        <Route index element={<Navigate to="/doctor/dashboard" replace />} />
+        <Route path="dashboard" element={<DoctorDashboard />} />
+        <Route path="appointments" element={<DoctorAppointments />} />
+        <Route path="patients" element={<DoctorPatients />} />
+        <Route path="consultation" element={<DoctorConsultation />} />
+        <Route path="prescriptions" element={<DoctorPrescriptions />} />
+        <Route path="messages" element={<DoctorMessages />} />
+        <Route path="profile" element={<DoctorProfile />} />
+        <Route path="notifications" element={<DoctorNotifications />} />
+      </Route>
 
-      {/* Admin Protected Routes */}
+      {/* Admin Portal (Nested in AdminLayout) */}
       <Route
-        path="/admin/dashboard"
+        path="/admin"
         element={
           <ProtectedRoute allowedRoles={['admin']}>
-            <AdminDashboard />
+            <AdminLayout />
           </ProtectedRoute>
         }
-      />
+      >
+        <Route index element={<Navigate to="/admin/dashboard" replace />} />
+        <Route path="dashboard" element={<AdminDashboard />} />
+        <Route path="doctors" element={<AdminDoctors />} />
+        <Route path="users" element={<AdminUsers />} />
+        <Route path="appointments" element={<AdminAppointments />} />
+      </Route>
 
       {/* Catch-all fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />

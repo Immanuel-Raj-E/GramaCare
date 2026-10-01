@@ -1,4 +1,4 @@
-﻿const path = require('path');
+const path = require('path');
 const express = require('express');
 const cors = require('cors');
 const { notFound, errorHandler } = require('./middleware/errorMiddleware');
@@ -14,6 +14,7 @@ const prescriptionRoutes = require('./routes/prescriptionRoutes');
 const medicalReportRoutes = require('./routes/medicalReportRoutes');
 const messageRoutes = require('./routes/messageRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 
 const app = express();
 
@@ -53,6 +54,7 @@ app.use('/api/prescriptions', prescriptionRoutes);
 app.use('/api/reports', medicalReportRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/admin', adminRoutes);
 
 // 404 & Centralized Error Handlers
 app.use(notFound);

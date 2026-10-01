@@ -1,4 +1,4 @@
-﻿const Appointment = require('../models/Appointment');
+const Appointment = require('../models/Appointment');
 const Patient = require('../models/Patient');
 const Doctor = require('../models/Doctor');
 const { createNotification } = require('../services/notificationService');
@@ -232,9 +232,53 @@ const cancelAppointment = async (req, res) => {
   }
 };
 
+// @desc    Update appointment status (confirmed, rejected, completed)
+// @route   PUT /api/appointments/:id/status
+// @access  Protected
+const updateAppointmentStatus = async (req, res) => {
+  try {
+    const { status, notes } = req.body;
+    if (!status || !['confirmed', 'rejected', 'completed', 'cancelled'].includes(status)) {
+      return errorResponse(res, 400, 'Invalid appointment status');
+    }
+
+    const appointment = await Appointment.findById(req.params.id)
+      .populate({ path: 'doctorId', populate: { path: 'userId', select: 'name' } })
+      .populate({ path: 'patientId', populate: { path: 'userId', select: '_id name' } });
+
+    if (!appointment) {
+      return errorResponse(res, 404, 'Appointment not found');
+    }
+
+    if (appointment.status === 'cancelled' && status === 'completed') {
+      return errorResponse(res, 400, 'Cancelled appointments cannot be completed (Rule 9)');
+    }
+
+    appointment.status = status;
+    if (notes) appointment.notes = notes;
+    await appointment.save();
+
+    // Notify patient
+    if (appointment.patientId?.userId?._id) {
+      await createNotification({
+        userId: appointment.patientId.userId._id,
+        title: `Appointment ${status.charAt(0).toUpperCase() + status.slice(1)}`,
+        message: `Your appointment with ${appointment.doctorId?.userId?.name || 'Healthcare Doctor'} has been marked as ${status}.`,
+        type: 'appointment'
+      });
+    }
+
+    return successResponse(res, 200, `Appointment marked as ${status}`, appointment);
+  } catch (error) {
+    console.error('updateAppointmentStatus error:', error);
+    return errorResponse(res, 500, error.message);
+  }
+};
+
 module.exports = {
   createAppointment,
   getAppointments,
   getAppointmentById,
-  cancelAppointment
+  cancelAppointment,
+  updateAppointmentStatus
 };

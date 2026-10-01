@@ -1,4 +1,4 @@
-﻿const Prescription = require('../models/Prescription');
+const Prescription = require('../models/Prescription');
 const Patient = require('../models/Patient');
 const Doctor = require('../models/Doctor');
 const { successResponse, errorResponse } = require('../utils/apiResponse');
@@ -74,7 +74,79 @@ const getPrescriptionById = async (req, res) => {
   }
 };
 
+// @desc    Create a new prescription
+// @route   POST /api/prescriptions
+// @access  Protected (Doctor)
+const createPrescription = async (req, res) => {
+  try {
+    const { patientId, appointmentId, medicines, generalInstructions } = req.body;
+
+    if (!patientId) {
+      return errorResponse(res, 400, 'Patient reference is required');
+    }
+
+    if (!Array.isArray(medicines) || medicines.length === 0) {
+      return errorResponse(res, 400, 'At least one medicine is required');
+    }
+
+    // Validate medicines structure
+    for (const med of medicines) {
+      if (!med.medicineName || !med.dosage || !med.frequency || !med.duration) {
+        return errorResponse(
+          res,
+          400,
+          'Each medicine must specify medicineName, dosage, frequency, and duration'
+        );
+      }
+    }
+
+    let doctorId = req.body.doctorId;
+    if (!doctorId) {
+      const doctor = await Doctor.findOne({ userId: req.user._id });
+      if (doctor) {
+        doctorId = doctor._id;
+      } else {
+        const firstDoc = await Doctor.findOne();
+        if (firstDoc) doctorId = firstDoc._id;
+      }
+    }
+
+    if (!doctorId) {
+      return errorResponse(res, 400, 'Doctor profile required to issue prescription');
+    }
+
+    const prescription = await Prescription.create({
+      patientId,
+      doctorId,
+      appointmentId: appointmentId || undefined,
+      medicines,
+      generalInstructions: generalInstructions || ''
+    });
+
+    const populated = await Prescription.findById(prescription._id)
+      .populate({ path: 'doctorId', populate: { path: 'userId', select: 'name email phone' } })
+      .populate({ path: 'patientId', populate: { path: 'userId', select: 'name email phone' } });
+
+    // Notify patient
+    const Notification = require('../models/Notification');
+    if (populated.patientId?.userId?._id) {
+      await Notification.create({
+        userId: populated.patientId.userId._id,
+        title: 'New Prescription Issued',
+        message: `Dr. ${populated.doctorId?.userId?.name || 'Healthcare Doctor'} has issued a new prescription for you with ${medicines.length} medicine(s).`,
+        type: 'prescription'
+      }).catch(err => console.error('Notification error in prescription:', err));
+    }
+
+    return successResponse(res, 201, 'Prescription issued successfully', populated);
+  } catch (error) {
+    console.error('createPrescription error:', error);
+    return errorResponse(res, 500, error.message);
+  }
+};
+
 module.exports = {
   getPrescriptions,
-  getPrescriptionById
+  getPrescriptionById,
+  createPrescription
 };
