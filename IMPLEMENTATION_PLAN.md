@@ -491,18 +491,18 @@ All responses follow the unified response format:
 - [x] Admin login functional (seeded admin account)
 - [ ] Admin can approve or reject doctor accounts
 - [ ] Approved doctor can update profile and availability
-- [ ] Patient can search approved doctors and book appointment
-- [ ] Double booking on same date and time slot is prevented
+- [x] Patient can search approved doctors and book appointment
+- [x] Double booking on same date and time slot is prevented
 - [ ] Doctor can accept, reject, and mark appointments completed
 - [ ] Doctor can create consultation EHR notes for completed appointments
 - [ ] Doctor can create multi-medicine prescriptions
-- [ ] Patient can view their medical records and prescriptions
-- [ ] Patient can upload medical reports (PDF/JPG/PNG)
-- [ ] Doctor and Patient can securely view and download authorized reports
-- [ ] Doctor-Patient messaging functional
-- [ ] System notifications generated on appointments, prescriptions, and reports
+- [x] Patient can view their medical records and prescriptions
+- [x] Patient can upload medical reports (PDF/JPG/PNG)
+- [x] Doctor and Patient can securely view and download authorized reports
+- [x] Doctor-Patient messaging functional
+- [x] System notifications generated on appointments, prescriptions, and reports
 - [x] Role-based route protection works on both frontend and backend
-- [x] Responsive design verified on Mobile, Tablet, and Desktop (Auth pages)
+- [x] Responsive design verified on Mobile, Tablet, and Desktop (Auth & Patient pages)
 - [x] Centralized error handling returns clean JSON responses
 - [x] Passwords hashed with bcrypt and never exposed in API responses
 - [ ] README.md contains complete setup instructions
