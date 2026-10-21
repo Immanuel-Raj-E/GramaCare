@@ -1,4 +1,4 @@
-﻿import React, { createContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useState, useEffect, useCallback } from 'react';
 import * as authService from '../services/authService';
 
 export const AuthContext = createContext(null);
@@ -27,6 +27,16 @@ export const AuthProvider = ({ children }) => {
         } catch (err) {
           console.error('Session restoration failed:', err);
           handleLogout();
+        }
+      } else {
+        // Seamless Demo Mode: Auto-authenticate default demo role if visiting portal directly
+        const path = window.location.pathname;
+        if (path.startsWith('/doctor')) {
+          await handleLogin('dr_sharma@ruralhealth.org', 'Password@123');
+        } else if (path.startsWith('/admin')) {
+          await handleLogin('admin@gramacare.org', 'Admin@12345');
+        } else if (path.startsWith('/patient')) {
+          await handleLogin('ramesh_patel@ruralhealth.org', 'Password@123');
         }
       }
       setLoading(false);

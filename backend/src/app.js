@@ -18,10 +18,20 @@ const adminRoutes = require('./routes/adminRoutes');
 
 const app = express();
 
-// CORS configuration
-const allowedOrigin = process.env.CLIENT_URL || 'http://localhost:5173';
+// CORS configuration: Support both localhost and 127.0.0.1 in local development
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+  process.env.CLIENT_URL
+].filter(Boolean);
+
 app.use(cors({
-  origin: allowedOrigin,
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(null, true);
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
